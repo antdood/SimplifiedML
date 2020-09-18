@@ -55,6 +55,10 @@ class gameState:
 
 		return False
 
+	@lru_cache
+	def isTiedGameState(self):
+		return len(self.possibleMoves()) == 0 and not self.wonGameState
+
 	def winnableLines(self):
 		# Horizontals
 		yield from self.grid
@@ -66,10 +70,6 @@ class gameState:
 		yield [self.grid[i][i] for i in range(3)]
 		yield [self.grid[i][abs(i-2)] for i in range(3)]
 
-	@lru_cache
-	def isTiedGameState(self):
-		return len(self.possibleMoves()) == 0 and not self.wonGameState
-
 	def getCurrentPlayerSymbol(self):
 		# Player 0 is O and player 1 is X
 		return ('O','X')[self.player]
@@ -80,4 +80,3 @@ class gameState:
 			rows.append("|".join(map(lambda x : x or " ", row)) + "\n")
 
 		return "-----\n".join(rows)
-		
