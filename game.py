@@ -1,14 +1,17 @@
 from copy import deepcopy
+from functools import lru_cache
 
 class gameState:
-	def __init__(self):
+	def __init__(self, grid = None):
 
-		# Initial empty grid. The Numpy package is useful for this in proper implementations.
-		self.grid = [[' ',' ',' '],
-					 [' ',' ',' '],
-					 [' ',' ',' ']]
+		# Initial grid. The Numpy package is useful for this in proper implementations.
+		self.grid = grid or \
+					[[None,None,None],
+					 [None,None,None],
+					 [None,None,None]]
 
 		self.player = 0
+
 		return
 
 	def possibleMoves(self):
@@ -19,7 +22,7 @@ class gameState:
 
 		for x, row in enumerate(self.grid):
 			for y, cell in enumerate(row):
-				if(cell == ' '):
+				if(cell == None):
 					out.append((x,y))
 
 		return out
@@ -43,6 +46,29 @@ class gameState:
 
 		return out
 
+	@lru_cache
+	def isWonGameState(self):
+
+		for line in self.winnableLines():
+			if(len(set(line)) == 1 and line[0] != None):
+				return True
+
+		return False
+
+	def winnableLines(self):
+		# Horizontals
+		yield from self.grid
+
+		# Verticals
+		yield from [[item[cell] for item in self.grid] for cell in range(3)]
+
+		# Diagonals
+		yield [self.grid[i][i] for i in range(3)]
+		yield [self.grid[i][abs(i-2)] for i in range(3)]
+
+	@lru_cache
+	def isTiedGameState(self):
+		return len(self.possibleMoves()) == 0 and not self.wonGameState
 
 	def getCurrentPlayerSymbol(self):
 		# Player 0 is O and player 1 is X
@@ -51,6 +77,14 @@ class gameState:
 	def __str__(self):
 		rows = []
 		for row in self.grid:
-			rows.append("|".join(row) + "\n")
+			rows.append("|".join(map(lambda x : x or " ", row)) + "\n")
 
 		return "-----\n".join(rows)
+
+a = gameState()
+
+print(a)
+
+print(a.isWonGameState())
+
+
