@@ -80,11 +80,4 @@ class gameState:
 			rows.append("|".join(map(lambda x : x or " ", row)) + "\n")
 
 		return "-----\n".join(rows)
-
-a = gameState()
-
-print(a)
-
-print(a.isWonGameState())
-
-
+		
