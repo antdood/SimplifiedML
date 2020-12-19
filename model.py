@@ -1,36 +1,34 @@
 import yaml
 import pickle
 import game
+import node
 
 class model: 
 	def __init__(self, modelPath = "model.yml"):
 		with open(modelPath) as modelFile:
-			self.model = yaml.safe_load(modelFile) or {}
+			self.modelData = yaml.safe_load(modelFile) or {}
+
+		self.rootNode = node.node(game.gameState(), self)
+		self.rootNode.isRoot = True
+		self.nodePath = []
+
 		return
-
-	def evaluate(self, gameState):
-
-		# Returns the probability of winning given a gameState
-
-		if(isinstance(gameState, game.gameState)):
-			gameState = pickle.dumps(gameState)
-
-		if(gameState in self.model.keys()):
-			return self.model[gameState]
-		else:
-			return self.initialize(gameState)
-
-	def initialize(self, gameState):
-
-		# Initializes the probability to win of a given gameState
-
-		self.model[gameState] = 0.5
-
-		return self.model[gameState]
 
 	def save(self, modelPath = "model.yml"):
 		with open(modelPath, "w") as modelFile:
-			yaml.dump(self.model, modelFile)
+			yaml.dump(self.modelData, modelFile)
 
+
+	def select(self):
+		# Recursively travels down the tree of nodes while maximizing UCB1 until a leaf node is reached
+		current = self.rootNode
+
+		while(not current.isLeaf()):
+			self.nodePath.append(current)
+			current = current.bestChildForSelection()
+
+		self.nodePath.append(current)
+
+		return current
 
 
