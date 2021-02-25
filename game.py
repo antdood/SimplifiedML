@@ -1,5 +1,6 @@
 from copy import deepcopy
 from functools import lru_cache
+import pickle
 
 class gameState:
 	def __init__(self, grid = None):
@@ -47,7 +48,7 @@ class gameState:
 		return False
 
 	def isTiedGameState(self):
-		return len(self.possibleMoves()) == 0 and not self.iswonGameState()
+		return len(self.possibleMoves()) == 0 and not self.isWonGameState()
 
 	def winnableLines(self):
 		# Horizontals
@@ -81,3 +82,6 @@ class gameState:
 			rows.append("|".join(map(lambda x : x or " ", row)) + "\n")
 
 		return "-----\n".join(rows)
+
+	def pickled(self):
+		return pickle.dumps(self)

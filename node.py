@@ -23,15 +23,14 @@ class node:
 		if(self.isRoot):
 			return False
 
-		# Any child not in modeldata
-		return (not all(map(lambda x : x in self.model.modelData, self.gameState.possibleGameStates())))
+		return (self.visits == 0)
 
 	def isExplored(self):
-		return (self.gameState in self.model.modelData)
+		return (self.gameState.pickled() in self.model.modelData)
 
 	def getData(self):
 		if(self.isExplored()):
-			return self.model.modelData[self.gameState]
+			return self.model.modelData[self.gameState.pickled()]
 		else:
 			return {}
 
@@ -53,7 +52,8 @@ class node:
 			if(visits == 0):
 				return float('inf')
 
-			return score + 1.0 * sqrt(log(totalVisitsAtLevel)/visits)
+			# A C value of sqrt 2 is generally chosen here. However, due to Tic Tac Toe having a low branching factor as well as a short number of moves to achieve terminal state, we can choose a higher C value to quikcly explore more lines.
+			return score + 2000 * sqrt(log(totalVisitsAtLevel)/visits)
 
 
 		return max(children, key = computeSelectionScoreForChild)
@@ -73,3 +73,16 @@ class node:
 
 		# Score of the game in terminal state
 		return state[1]
+
+	def updateScore(self, score):
+		player = self.gameState.player
+
+		# Values here can be tweaked
+		if(score == 0):
+			self.score += 0
+		elif(player == score):
+			self.score += 1
+		else:
+			self.score -= 1
+
+		return
